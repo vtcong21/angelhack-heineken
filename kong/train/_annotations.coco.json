@@ -29,7 +29,7 @@
             "id": 2,
             "name": "beer_bottle",
             "supercategory": "beers"
-        },
+        }, 
         {
             "id": 3,
             "name": "beer_can",
