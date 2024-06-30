@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './page2.css';
-import ObjectDetection from '../component/objectDetection';
+import ObjectDetection from '../component/ObjectDetection';
 
 
 const Page = () => {
