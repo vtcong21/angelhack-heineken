@@ -25,7 +25,7 @@ const UploadImage = ({ onUpload, uploadedImageUrl, context, handleReset }) => {
           padding: "10px 0",
         }}
       >
-        <div
+        {/* <div
           style={{
             width: "100px",
             padding: "10px",
@@ -35,7 +35,7 @@ const UploadImage = ({ onUpload, uploadedImageUrl, context, handleReset }) => {
         >
           <h3>Context</h3>
           <p>{context}</p>
-        </div>
+        </div> */}
 
         <div
           style={{
