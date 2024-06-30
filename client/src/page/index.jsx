@@ -25,17 +25,18 @@ const UploadImage = ({ onUpload, uploadedImageUrl, context, handleReset }) => {
           padding: "10px 0",
         }}
       >
-        {/* <div
+        <div
           style={{
             width: "100px",
             padding: "10px",
             backgroundColor: "#f9f9f9",
+            textAlign: "center",
             border: "1px solid #ccc",
           }}
         >
           <h3>Context</h3>
           <p>{context}</p>
-        </div> */}
+        </div>
 
         <div
           style={{
@@ -142,7 +143,8 @@ const ImageAnalysis = ({ imageInfo }) => {
 const Page = () => {
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const [imageInfo, setImageInfo] = useState("");
-  const context = "#Shopping #Grocery Store #Outlets";
+  //const context = "#Shopping #Grocery Store #Outlets";
+  const context = "";
   const API_URL = "https://my-service-4ylilurj2q-as.a.run.app";
 
   const handleUpload = async ({ base64, file }) => {
