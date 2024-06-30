@@ -1,78 +1,139 @@
-import React, { useState } from "react";
 import axios from "axios";
+import React, { useState } from "react";
+
 // Component UploadImage
-const UploadImage = ({ onUpload, uploadedImageUrl }) => {
-  const handleUpload = (event) => {
+const UploadImage = ({ onUpload, uploadedImageUrl, context, handleReset }) => {
+  const handleFileChange = (event) => {
     const file = event.target.files[0];
-    onUpload(URL.createObjectURL(file));
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        onUpload({ base64: reader.result, file });
+      };
+    }
   };
 
   return (
-    <div
-      style={{
-        backgroundColor: "#d1d5db",
-        padding: "20px",
-        flex: 1,
-        margin: "10px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <h2 className="text-red-600 ">Upload Image</h2>
-      <input type="file" accept="image/*" onChange={handleUpload} />
-      {uploadedImageUrl && (
-        <div style={{ marginTop: "20px" }}>
-          <h3>Uploaded Image</h3>
-          <img
-            src={uploadedImageUrl}
-            alt="Uploaded"
-            style={{ maxWidth: "100%", height: "auto" }}
-          />
+    <>
+      <div
+        style={{
+          display: "flex",
+          width: "100%",
+          justifyContent: "center",
+          borderBottom: "1px solid #ccc",
+          padding: "10px 0",
+        }}
+      >
+        <div
+          style={{
+            width: "100px",
+            padding: "10px",
+            backgroundColor: "#f9f9f9",
+            border: "1px solid #ccc",
+          }}
+        >
+          <h3>Context</h3>
+          <p>{context}</p>
         </div>
-      )}
-      <button >Send</button>
-    </div>
+
+        <div
+          style={{
+            width: "60%",
+            padding: "20px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            borderRight: "1px solid #ccc",
+            backgroundColor: "#f9f9f9",
+          }}
+        >
+          <h2>Input Image</h2>
+          
+          {uploadedImageUrl && (
+            <img
+              src={uploadedImageUrl.base64}
+              alt="Uploaded"
+              style={{ maxWidth: "100%", height: "auto", marginBottom: "20px" }}
+            />
+          )}
+          <div style={{}}>
+            <div style={{ marginBottom: "20px" }}>
+              <button
+                onClick={() => document.getElementById("fileInput").click()}
+                style={{ padding: "10px 20px", margin: "5px" }}
+              >
+                Import from file
+              </button>
+              <input
+                id="fileInput"
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={handleFileChange}
+              />
+              <button
+                onClick={handleReset}
+                style={{ padding: "10px 20px", margin: "5px" }}
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 
-// Component FetchAndRenderImage
-const FetchAndRenderImage = () => {
-  const [imageUrl, setImageUrl] = useState("");
-
- const fetchImage = async () => {
-    console.log("Fetching image...");
-   try {
-     const response = await axios.get(
-       "https://images.unsplash.com/photo-1719216324463-92a973ebf910?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-     ); // Thay thế URL API thực tế
-     setImageUrl(response.data.imageUrl);
-     console.log("Image fetched:", response.data.imageUrl);
-   } catch (error) {
-     console.error("Error fetching image:", error);
-   }
- };
+// Component ImageAnalysis
+const ImageAnalysis = ({ imageInfo }) => {
   return (
     <div
       style={{
-        backgroundColor: "#f3f4f6",
+        width: "800px",
         padding: "20px",
-        flex: 1,
-        margin: "10px",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        margin: "20px",
       }}
     >
-      <h2>Fetched Image</h2>
-      <button onClick={fetchImage}>Fetch Image</button>
-      {imageUrl && (
-        <img
-          src={imageUrl}
-          alt="Fetched"
-          style={{ maxWidth: "100%", height: "auto", marginTop: "20px" }}
-        />
-      )}
+      <h2>Image Analysis</h2>
+      <div
+        style={{
+          width: "100%",
+          backgroundColor: "#e2e8f0",
+          padding: "20px",
+          borderRadius: "10px",
+          marginBottom: "20px",
+          textAlign: "left",
+          maxHeight: "300px", // Adjust the height as needed
+          overflowY: "auto", // Enable vertical scrolling
+        }}
+      >
+        <pre>{imageInfo}</pre>
+      </div>
+      {/* <div className="">
+        <button
+          onClick={() => console.log("Chain with...")}
+          style={{ padding: "10px 20px", margin: "5px" }}
+        >
+          Chain with...
+        </button>
+        <button
+          onClick={() => console.log("Save as...")}
+          style={{ padding: "10px 20px", margin: "5px" }}
+        >
+          Save as...
+        </button>
+        <button
+          onClick={() => console.log("Copy to clipboard")}
+          style={{ padding: "10px 20px", margin: "5px" }}
+        >
+          Copy to clipboard
+        </button>
+      </div> */}
     </div>
   );
 };
@@ -80,23 +141,65 @@ const FetchAndRenderImage = () => {
 // Main Page Component
 const Page = () => {
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+  const [imageInfo, setImageInfo] = useState("");
+  const context = "#Shopping #Grocery Store #Outlets";
+  const API_URL = "https://my-service-4ylilurj2q-as.a.run.app";
+
+  const handleUpload = async ({ base64, file }) => {
+    setUploadedImageUrl({ base64, file });
+
+    const formData = new FormData();
+    formData.append("image", file);
+    try {
+      const response = await axios.post(`${API_URL}/api/upload/`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log(response.data);
+      setImageInfo(`Image uploaded successfully!`);
+    } catch (error) {
+      console.error(error);
+      setImageInfo(`Error uploading image: ${error.message}`);
+    }
+  };
+
+  const handleReset = () => {
+    setUploadedImageUrl(null);
+    setImageInfo("");
+  };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        padding: "20px",
-        height: "100vh",
-      }}
-    >
-      <FetchAndRenderImage />
+    <div style={styles.main}>
       <UploadImage
-        onUpload={setUploadedImageUrl}
+        onUpload={handleUpload}
         uploadedImageUrl={uploadedImageUrl}
+        context={context}
+        handleReset={handleReset}
       />
+      <ImageAnalysis imageInfo={imageInfo} />
     </div>
   );
 };
 
 export default Page;
+
+const styles = {
+  upload: {},
+  analysis: {},
+  main: {
+    display: "flex",
+    height: "auto",
+    minHeight: "500px",
+    width: "1300px",
+    backgroundColor: "#fff",
+    borderRadius: "10px",
+    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+  },
+};
