@@ -158,8 +158,10 @@ const Page = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-      console.log(response.data);
-      setImageInfo(`Image uploaded successfully!`);
+      // console.log(response.data);
+      // setImageInfo(`Image uploaded successfully!`);
+      const uploadedImageUrl = response.data.imageUrl;
+      setUploadedImageUrl({ base64: uploadedImageUrl, file });
     } catch (error) {
       console.error(error);
       setImageInfo(`Error uploading image: ${error.message}`);
